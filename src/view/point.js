@@ -1,21 +1,23 @@
 import {createElement} from '../render.js';
-import {humanizePointDate, humanizePointDateFrom, humanizePointDateTo} from '../utils.js';
-import {offersByType, destinations} from '../mock/mock-point.js';
-
+import {humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo} from '../utils.js';
 
 function createPointTemplate (point) {
-  const {basePrice, dateFrom, dateTo, type, offers, destination} = point;
-
+  const {basePrice, dateFrom, dateTo, type, destination, offers} = point;
   const date = humanizePointDate(dateFrom);
-  const dateTimeFrom = humanizePointDateFrom(date);
-  const dateTimeTo = humanizePointDateTo(dateTo);
-  const pointTypeOffer = offersByType.find((offer) => offer.type === type);
-  const pointDestination = destinations.find((item) => destination === item.id);
+  const dateTimeFrom = humanizePointTimeFrom(date);
+  const dateTimeTo = humanizePointTimeTo(dateTo);
+  const offer = offers.offers;
+  const getOfferItem = offer.map(({title,price}) => (
+    `<li class="event__offer">
+        <span class="event__offer-title">${title}</span>
+          &plus;&euro;&nbsp;
+        <span class="event__offer-price">${price}</span>
+     </li>`)).join('');
 
   return (
     `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="">${date}</time>
+      <time class="event__date" datetime="${date}">${date}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
@@ -32,13 +34,7 @@ function createPointTemplate (point) {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-      ${offers.map((offer) => (
-      `<li class="event__offer">
-          <span class="event__offer-title">${offer.title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offer.price}</span>
-        </li>`
-    )).join('')}
+      ${getOfferItem}
       </ul>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>

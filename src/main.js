@@ -1,6 +1,6 @@
 import FilterListView from './view/filter-list.js';
 import SortListView from './view/sort-list.js';
-import CreationFormView from './view/creation-form.js';
+// import CreationFormView from './view/creation-form.js';
 import PointsModel from './model/point-model.js';
 import {render} from './render.js';
 import BoardPresenter from './presenter/board-presenter.js';
@@ -15,7 +15,6 @@ const boardPresenter = new BoardPresenter({
 
 render(new FilterListView(), siteHeaderElement);
 render(new SortListView(), siteMainElement);
-render(new CreationFormView(), siteMainElement);
 
 boardPresenter.init();
 
