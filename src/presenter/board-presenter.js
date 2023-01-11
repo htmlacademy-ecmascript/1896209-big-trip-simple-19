@@ -3,6 +3,9 @@ import EditFormView from '../view/edit-form.js';
 import PointView from '../view/point.js';
 import ListView from '../view/list.js';
 import CreationFormView from '../view/creation-form';
+import NoPointView from '../view/no-point.js';
+
+const FOR_TEST = 0;
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -21,11 +24,15 @@ export default class BoardPresenter {
     this.#boardPoints = [...this.#pointsModel.points];
 
     render(this.#boardComponent, this.#boardContainer);
-    render(new CreationFormView({point: this.#boardPoints[0]}), this.#boardComponent.element, RenderPosition.BEFOREEND);
 
-    for (let i = 1; i < this.#boardPoints.length; i++) {
-      this.#renderPoint(this.#boardPoints[i]);
-    }
+    if (this.#boardPoints.length === FOR_TEST) {
+      render(new NoPointView(), this.#boardComponent.element);
+    } else {
+      render(new CreationFormView({point: this.#boardPoints[0]}), this.#boardComponent.element, RenderPosition.BEFOREEND);
+
+      for (let i = 1; i < this.#boardPoints.length; i++) {
+        this.#renderPoint(this.#boardPoints[i]);
+      }}
   }
 
   #renderPoint(point) {
