@@ -28,7 +28,8 @@ function createEditFormTemplate (point) {
   }
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class = "trip-events__item">
+    <form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -93,28 +94,32 @@ function createEditFormTemplate (point) {
         <p class="event__destination-description">${getDestination(point).description}</p>
       </section>
     </section>
-  </form>`
+  </form>
+    </li>`
   );
 }
 
 export default class EditFormView {
+  #element = null;
+  #point = null;
+
   constructor({point}) {
-    this.point = point;
+    this.#point = point;
   }
 
-  getTemplate() {
-    return createEditFormTemplate(this.point);
+  get template() {
+    return createEditFormTemplate(this.#point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
