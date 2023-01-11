@@ -5,22 +5,27 @@ import ListView from '../view/list.js';
 import CreationFormView from '../view/creation-form';
 
 export default class BoardPresenter {
-  boardComponent = new ListView();
+  #boardContainer = null;
+  #pointsModel = null;
+
+  #boardComponent = new ListView();
+
+  #boardPoints = [];
 
   constructor({boardContainer, pointsModel}) {
-    this.boardContainer = boardContainer;
-    this.pointsModel = pointsModel;
+    this.#boardContainer = boardContainer;
+    this.#pointsModel = pointsModel;
   }
 
   init() {
-    this.boardPoints = [...this.pointsModel.getPoints()];
+    this.#boardPoints = [...this.#pointsModel.points];
 
-    render(this.boardComponent, this.boardContainer);
-    render(new EditFormView({point: this.boardPoints[0]}), this.boardComponent.getElement(), RenderPosition.BEFOREEND);
-    render(new CreationFormView({point: this.boardPoints[0]}), this.boardComponent.getElement(), RenderPosition.BEFOREEND);
+    render(this.#boardComponent, this.#boardContainer);
+    render(new EditFormView({point: this.#boardPoints[0]}), this.#boardComponent.element, RenderPosition.BEFOREEND);
+    render(new CreationFormView({point: this.#boardPoints[0]}), this.#boardComponent.element, RenderPosition.BEFOREEND);
 
-    for (let i = 1; i < this.boardPoints.length; i++) {
-      render(new PointView({point: this.boardPoints[i]}), this.boardComponent.getElement());
+    for (let i = 1; i < this.#boardPoints.length; i++) {
+      render(new PointView({point: this.#boardPoints[i]}), this.#boardComponent.element);
     }
   }
 }
