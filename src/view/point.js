@@ -1,18 +1,20 @@
 import {createElement} from '../render.js';
 import {humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo} from '../utils.js';
+import {getOffersByType, getDestination} from '../mock/mock-point.js';
+
+const renderOfferItem = (offers) =>
+  offers.map((offer) => `<li class="event__offer">
+  <span class="event__offer-title">${offer.title}</span>
+    &plus;&euro;&nbsp;
+  <span class="event__offer-price">${offer.price}</span>
+</li>`).join('');
 
 function createPointTemplate (point) {
-  const {basePrice, dateFrom, dateTo, type, destination, offers} = point;
+  const {basePrice, dateFrom, dateTo, type} = point;
   const date = humanizePointDate(dateFrom);
   const dateTimeFrom = humanizePointTimeFrom(date);
   const dateTimeTo = humanizePointTimeTo(dateTo);
-  const offer = offers.offers;
-  const getOfferItem = offer.map(({title,price}) => (
-    `<li class="event__offer">
-        <span class="event__offer-title">${title}</span>
-          &plus;&euro;&nbsp;
-        <span class="event__offer-price">${price}</span>
-     </li>`)).join('');
+  const offersForType = getOffersByType(point);
 
   return (
     `<li class="trip-events__item">
@@ -21,7 +23,7 @@ function createPointTemplate (point) {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${destination.name}</h3>
+      <h3 class="event__title">${type} ${getDestination(point).name}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-18T10:30">${dateTimeFrom}</time>
@@ -34,7 +36,7 @@ function createPointTemplate (point) {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-      ${getOfferItem}
+      ${renderOfferItem(offersForType.offers)}
       </ul>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>

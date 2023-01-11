@@ -1,3 +1,3 @@
-const TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+const TYPE = ['taxi', 'ship', 'flight'];
 
 export {TYPE};

@@ -1,25 +1,33 @@
 import {createElement} from '../render.js';
 import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils.js';
+import {getOffersByType, getDestination} from '../mock/mock-point.js';
+
+const renderOfferForType = (offers) =>
+  offers.map((offer) => `<div class="event__offer-selector">
+  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
+    <label class="event__offer-label" for="event-offer-luggage-1">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </label>
+</div>`).join('');
+
+const renderDestinationForType = (destinations) =>
+  destinations.map((picture) =>
+    `<img class="event__photo" src="${picture.src}" alt="${picture.description}">
+    <img class="event__photo" src="${picture.src}" alt="${picture.description}">
+    <img class="event__photo" src="${picture.src}" alt="${picture.description}">
+    <img class="event__photo" src="${picture.src}" alt="${picture.description}">
+    <img class="event__photo" src="${picture.src}" alt="${picture.description}">`
+  ).join('');
 
 function createCreationFormTemplate (point) {
-  const {dateFrom, dateTo, type, destination, offers} = point;
+  const {dateFrom, dateTo, type} = point;
+  const offersForType = getOffersByType(point);
+  const destinationForType = getDestination(point);
 
   const dateTimeFrom = humanizePointDateTimeFrom(dateFrom);
   const dateTimeTo = humanizePointDateTimeTo(dateTo);
-  const offer = offers.offers;
-  const getOffer = offer.map(({title,price}) => (
-    `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-        <label class="event__offer-label" for="event-offer-luggage-1">
-          <span class="event__offer-title">${title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${price}</span>
-        </label>
-    </div>`)).join('');
-
-  // const getPrice = offer.map(({price}) => (
-  //   `<input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}"></input>`
-  // )).join('');
 
   function getEventTypeItem () {
     return (
@@ -51,11 +59,11 @@ function createCreationFormTemplate (point) {
         <label class="event__label  event__type-output" for="event-destination-1">
         ${type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestination(point).name}" list="destination-list-1">
         <datalist id="destination-list-1">
-          <option value="${destination.name}"></option>
-          <option value="${destination.name}"></option>
-          <option value="${destination.name}"></option>
+          <option value="${getDestination(point).name}"></option>
+          <option value="${getDestination(point).name}"></option>
+          <option value="${getDestination(point).name}"></option>
         </datalist>
       </div>
 
@@ -82,21 +90,17 @@ function createCreationFormTemplate (point) {
       <section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${getOffer}
+        ${renderOfferForType(offersForType.offers)}
         </div>
       </section>
 
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${destination.description}</p>
+        <p class="event__destination-description">${getDestination(point).description}</p>
 
         <div class="event__photos-container">
           <div class="event__photos-tape">
-            <img class="event__photo" src="${destination.pictures.src}.jpg" alt="${destination.pictures.description}">
-            <img class="event__photo" src="${destination.pictures.src}.jpg" alt="${destination.pictures.description}">
-            <img class="event__photo" src="${destination.pictures.src}.jpg" alt="${destination.pictures.description}">
-            <img class="event__photo" src="${destination.pictures.src}.jpg" alt="${destination.pictures.description}">
-            <img class="event__photo" src="${destination.pictures.src}.jpg" alt="${destination.pictures.description}">
+          ${renderDestinationForType(destinationForType.pictures)}
           </div>
         </div>
       </section>
