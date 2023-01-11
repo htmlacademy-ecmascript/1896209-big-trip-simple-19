@@ -22,7 +22,6 @@ export default class BoardPresenter {
 
     render(this.#boardComponent, this.#boardContainer);
     render(new CreationFormView({point: this.#boardPoints[0]}), this.#boardComponent.element, RenderPosition.BEFOREEND);
-    // this.#renderEditForm(this.#boardPoints[0]);
 
     for (let i = 1; i < this.#boardPoints.length; i++) {
       this.#renderPoint(this.#boardPoints[i]);
@@ -67,9 +66,4 @@ export default class BoardPresenter {
 
     render(pointComponent, this.#boardComponent.element);
   }
-
-  // #renderEditForm(point) {
-  //   const editFormComponent = new EditFormView({point});
-  //   render(editFormComponent, this.#boardComponent.element);
-  // }
 }
