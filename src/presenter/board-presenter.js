@@ -1,4 +1,4 @@
-import {render, replace, remove, RenderPosition} from '../framework/render.js';
+import {render, replace, RenderPosition} from '../framework/render.js';
 import EditFormView from '../view/edit-form.js';
 import PointView from '../view/point.js';
 import ListView from '../view/list.js';
