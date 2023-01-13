@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils.js';
 import {getOffersByType, getDestination} from '../mock/mock-point.js';
 
@@ -99,27 +99,25 @@ function createEditFormTemplate (point) {
   );
 }
 
-export default class EditFormView {
-  #element = null;
+export default class EditFormView extends AbstractView {
+  #handleFormSubmit = null;
   #point = null;
 
-  constructor({point}) {
+  constructor({point, onFormSubmit}) {
+    super();
     this.#point = point;
+    this.#handleFormSubmit = onFormSubmit;
+
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleFormSubmit);
   }
 
   get template() {
     return createEditFormTemplate(this.#point);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }

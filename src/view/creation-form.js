@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils.js';
 import {getOffersByType, getDestination} from '../mock/mock-point.js';
 
@@ -109,27 +109,15 @@ function createCreationFormTemplate (point) {
   );
 }
 
-export default class CreationFormView {
-  #element = null;
+export default class CreationFormView extends AbstractView{
   #point = null;
 
   constructor({point}) {
+    super();
     this.#point = point;
   }
 
   get template() {
     return createCreationFormTemplate(this.#point);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

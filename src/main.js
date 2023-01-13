@@ -1,6 +1,6 @@
+import {render} from './framework/render.js';
 import FilterListView from './view/filter-list.js';
 import PointsModel from './model/point-model.js';
-import {render} from './render.js';
 import BoardPresenter from './presenter/board-presenter.js';
 
 const siteHeaderElement = document.querySelector('.trip-controls__filters');
