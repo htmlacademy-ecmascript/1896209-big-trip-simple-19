@@ -1,4 +1,4 @@
-import {render, RenderPosition} from '../framework/render.js';
+import {render, replace, remove, RenderPosition} from '../framework/render.js';
 import EditFormView from '../view/edit-form.js';
 import PointView from '../view/point.js';
 import ListView from '../view/list.js';
@@ -64,11 +64,11 @@ export default class BoardPresenter {
     });
 
     function replacePointToForm () {
-      this.#boardComponent.element.replaceChild(pointEditFormComponent.element, pointComponent.element);
+      replace(pointEditFormComponent, pointComponent);
     }
 
     function replaceFormToPoint () {
-      this.#boardComponent.element.replaceChild(pointComponent.element, pointEditFormComponent.element);
+      replace(pointComponent, pointEditFormComponent);
     }
 
     render(pointComponent, this.#boardComponent.element);
