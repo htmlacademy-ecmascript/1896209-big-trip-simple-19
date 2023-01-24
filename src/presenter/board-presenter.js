@@ -17,6 +17,7 @@ export default class BoardPresenter {
 
   #boardPoints = [];
   #renderedPointCount = POINT_STEP;
+  #pointPresenter = new Map();
 
   constructor({boardContainer, pointsModel}) {
     this.#boardContainer = boardContainer;
@@ -29,6 +30,10 @@ export default class BoardPresenter {
     this.#renderBoard();
   }
 
+  #handleModeChange = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
+
   #renderSort() {
     render(this.#sortComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
   }
@@ -36,8 +41,10 @@ export default class BoardPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       pointListContainer: this.#boardComponent.element,
+      onModeChange: this.#handleModeChange
     });
     pointPresenter.init(point);
+    this.#handleModeChange();
   }
 
   #renderPoints(from, to) {
