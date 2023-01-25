@@ -39,4 +39,12 @@ function humanizePointDateTimeTo(dateTo) {
   return dateTo ? dayjs(dateTo).format(DATE_TIME_FORMAT) : '';
 }
 
-export {getRandomArrayElement, humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo, getRandomPositiveInteger, humanizePointDateTimeFrom, humanizePointDateTimeTo};
+function sortDatePoint(pointA, pointB) {
+  return dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+}
+
+function sortPricePoint(pointA, pointB) {
+  return pointB.price - pointA.price;
+}
+
+export {getRandomArrayElement, humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo, getRandomPositiveInteger, humanizePointDateTimeFrom, humanizePointDateTimeTo, sortPricePoint, sortDatePoint};

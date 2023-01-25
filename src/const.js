@@ -1,3 +1,8 @@
 const TYPE = ['taxi', 'ship', 'flight'];
 
-export {TYPE};
+const SortType = {
+  DATE_DOWN: 'date-down',
+  PRICE_DOWN: 'price-down',
+};
+
+export {TYPE, SortType};
