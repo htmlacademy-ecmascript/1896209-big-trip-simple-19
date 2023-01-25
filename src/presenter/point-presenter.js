@@ -9,7 +9,7 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
-  #handleModeChange = null;
+  #setDefaultView = null;
 
   #pointComponent = null;
   #pointEditComponent = null;
@@ -17,9 +17,9 @@ export default class PointPresenter {
   #point = null;
   #mode = Mode.DEFAULT;
 
-  constructor({pointListContainer, onModeChange}) {
+  constructor({pointListContainer, setDefaultView}) {
     this.#pointListContainer = pointListContainer;
-    this.#handleModeChange = onModeChange;
+    this.#setDefaultView = setDefaultView;
   }
 
   init(point) {
@@ -58,9 +58,9 @@ export default class PointPresenter {
   }
 
   #replacePointToForm () {
+    this.#setDefaultView();
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
 
