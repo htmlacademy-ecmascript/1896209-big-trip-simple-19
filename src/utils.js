@@ -44,7 +44,7 @@ function sortDatePoint(pointA, pointB) {
 }
 
 function sortPricePoint(pointA, pointB) {
-  return pointB.price - pointA.price;
+  return pointB.basePrice - pointA.basePrice;
 }
 
 export {getRandomArrayElement, humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo, getRandomPositiveInteger, humanizePointDateTimeFrom, humanizePointDateTimeTo, sortPricePoint, sortDatePoint};

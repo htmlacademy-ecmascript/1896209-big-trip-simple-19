@@ -65,7 +65,7 @@ export default class BoardPresenter {
   #handleSortTypeChange = (sortType) => {
     this.#sortPoints(sortType);
     this.#clearPointsList();
-    this.#renderPoint();
+    this.#renderPoints();
   };
 
   #renderSort() {
@@ -76,19 +76,19 @@ export default class BoardPresenter {
     // render(this.#sortComponent, this.#boardContainer);
   }
 
-  #renderPoint(point) {
+  #renderPoint(point, index) {
     const pointPresenter = new PointPresenter({
       pointListContainer: this.#boardComponent.element,
       setDefaultView: this.#setDefaultPointsView,
     });
     pointPresenter.init(point);
-    this.renderedPoints.push(pointPresenter);
+    // this.renderedPoints.push(pointPresenter);
+    this.#pointPresenter.set(index, pointPresenter);
   }
 
-  #renderPoints(from, to) {
+  #renderPoints() {
     this.#boardPoints
-      .slice(from, to)
-      .forEach((point) => this.#renderPoint(point));
+      .forEach((point, index) => this.#renderPoint(point, index));
   }
 
   #renderNoPoint() {
