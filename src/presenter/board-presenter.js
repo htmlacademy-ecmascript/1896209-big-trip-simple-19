@@ -50,10 +50,7 @@ export default class BoardPresenter {
       case SortType.DATE_DOWN:
       default:
         this.#boardPoints.sort(sortDatePoint);
-        // this.#boardPoints = [...this.#sourcedPoints];
     }
-
-    // this.#currentSortType = sortType;
   }
 
   #clearPointsList() {
@@ -73,7 +70,6 @@ export default class BoardPresenter {
       onSortTypeChange: this.#handleSortTypeChange
     });
     render(this.#sortComponent, this.#boardComponent.element, RenderPosition.AFTERBEGIN);
-    // render(this.#sortComponent, this.#boardContainer);
   }
 
   #renderPoint(point, index) {
@@ -82,7 +78,7 @@ export default class BoardPresenter {
       setDefaultView: this.#setDefaultPointsView,
     });
     pointPresenter.init(point);
-    // this.renderedPoints.push(pointPresenter);
+    this.renderedPoints.push(pointPresenter);
     this.#pointPresenter.set(index, pointPresenter);
   }
 
