@@ -1,4 +1,5 @@
-const TYPE = ['taxi', 'ship', 'flight'];
+// const TYPE = ['taxi', 'ship', 'flight'];
+const TYPE = ['bus', 'taxi', 'drive'];
 
 const SortType = {
   DATE_DOWN: 'date-down',

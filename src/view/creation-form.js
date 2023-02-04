@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils.js';
-import {getOffersByType, getDestination} from '../mock/mock-point.js';
+// import {getOffersByType, getDestination} from '../mock/mock-point.js';
 
 const renderOfferForType = (offers) =>
   offers.map((offer) => `<div class="event__offer-selector">
