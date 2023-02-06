@@ -1,16 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils.js';
-// import {getOffersByType, getDestination} from '../mock/mock-point.js';
-
-// const renderOfferForType = (offers) =>
-//   offers.map((offer) => `<div class="event__offer-selector">
-//   <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
-//     <label class="event__offer-label" for="event-offer-luggage-1">
-//       <span class="event__offer-title">${offer.title}</span>
-//       &plus;&euro;&nbsp;
-//       <span class="event__offer-price">${offer.price}</span>
-//     </label>
-// </div>`).join('');
 
 function renderOfferForType(offer, checked) {
   return `<div class="event__offer-selector">
@@ -26,40 +15,27 @@ function renderOfferForType(offer, checked) {
 function getEventTypeItem (type) {
   return `<div class="event__type-item">
       <input id="event-type-${type}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
+      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}">${type}</label>
     </div>`;
 }
 
-// function createPictureTemplate(picture) {
-//   return `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`;}
+function createPictureTemplate(picture) {
+  return `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`;}
 
 function createDestinationTemplate(destinations){
   return ` <option value="${destinations.name}"></option>`;
 }
 
 function createEditFormTemplate (state, offersByType, destinations) {
-  // const {dateFrom, dateTo} = point;
-  const destinationsT = destinations.map((destination) => state.description === destination.des);
-
-  // const dateTimeFrom = humanizePointDateTimeFrom(dateFrom);
-  // const dateTimeTo = humanizePointDateTimeTo(dateTo);
-  // const offersForType = getOffersByType(point);
-
   const offersTemplate = offersByType.find((offers) => state.type === offers.type)
     .offers
     .map((offers) => renderOfferForType(offers, state.offers.some((pointOffer) => pointOffer.id === offers.id)))
     .join('\n');
-  const eventTypeTemplate = offersByType.map((offer)=> offer.type).map((type)=> getEventTypeItem(type)).join('\n');
-  // const picturesTemplate = state.destination.pictures.map((picture) => createPictureTemplate(picture)).join('\n');
+  const eventTypeTemplate = offersByType.map((offer) => offer.type).map((type)=> getEventTypeItem(type)).join('\n');
+
+  const picturesTemplate = state.destinations.pictures.map((picture) => createPictureTemplate(picture)).join('\n');
+
   const destinationsTemplate = destinations.map((destination) => createDestinationTemplate(destination)).join('\n');
-  // eslint-disable-next-line no-console
-  console.log(destinationsT);
-  // function getEventTypeItem (type) {
-  //   return `<div class="event__type-item">
-  //       <input id="event-type-${type}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-  //       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
-  //     </div>`;
-  // }
 
   return (
     `<li class = "trip-events__item">
@@ -75,9 +51,7 @@ function createEditFormTemplate (state, offersByType, destinations) {
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Event type</legend>
-           ${eventTypeTemplate}
-           ${eventTypeTemplate}
-           ${eventTypeTemplate}
+            ${eventTypeTemplate}
           </fieldset>
         </div>
       </div>
@@ -88,18 +62,16 @@ function createEditFormTemplate (state, offersByType, destinations) {
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${state.destinations.name}" list="destination-list-1">
         <datalist id="destination-list-1">
-          <option value="${destinationsTemplate}"></option>
-          <option value="${destinationsTemplate}"></option>
-          <option value="${destinationsTemplate}"></option>
+          ${destinationsTemplate}
         </datalist>
       </div>
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizePointDateTimeFrom(state.dateTimeFrom)}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizePointDateTimeFrom(state.dateFrom)}">
         &mdash;
-        <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizePointDateTimeTo(state.dateTimeTo)}">
+        <label class="visually-hidden" for="event-end-time-2">To</label>
+        <input class="event__input  event__input--time" id="event-end-time-2" type="text" name="event-end-time" value="${humanizePointDateTimeTo(state.dateTo)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -129,6 +101,14 @@ function createEditFormTemplate (state, offersByType, destinations) {
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${state.destinations.description}</p>
       </section>
+
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${picturesTemplate}
+        </div>
+      </div>
+
+
     </section>
   </form>
     </li>`
@@ -156,7 +136,17 @@ export default class EditFormView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(EditFormView.parseStateToPoint(this._state));
+    this.#handleFormSubmit(this.#parseStateToPoint(this._state));
+  };
+
+  #handleEventInput = (evt) => {
+    const destValue = evt.target.value;
+    const currentDestination = this.#destinations.find((el) => el.name.toLowerCase() === destValue.toLowerCase());
+    if (currentDestination) {
+      this.updateElement({
+        destinations: currentDestination
+      });
+    }
   };
 
   _restoreHandlers = () => {
@@ -167,7 +157,12 @@ export default class EditFormView extends AbstractStatefulView {
       .forEach((el) => {
         el.addEventListener('change', this.#eventChangeHandler);
       });
+    this.element.querySelector('.event__input--destination').addEventListener('input', this.#handleEventInput);
   };
+
+  #parseStateToPoint(state) {
+    return {...state};
+  }
 
   #parsePointToState(point) {
     return {...point};
@@ -179,4 +174,5 @@ export default class EditFormView extends AbstractStatefulView {
       type: evt.target.value
     });
   };
+
 }

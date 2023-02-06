@@ -1,6 +1,5 @@
 import {render, RenderPosition} from '../framework/render.js';
 import ListView from '../view/list.js';
-// import CreationFormView from '../view/creation-form';
 import NoPointView from '../view/no-point.js';
 import SortListView from '../view/sort-list.js';
 import PointPresenter from './point-presenter.js';
@@ -14,7 +13,6 @@ export default class BoardPresenter {
   #pointsModel = null;
 
   #boardComponent = new ListView();
-  // #sortComponent = new SortListView();
   #sortComponent = null;
   #noPointComponent = new NoPointView();
   #currentSortType = SortType.DEFAULT;
@@ -32,8 +30,9 @@ export default class BoardPresenter {
   }
 
   init() {
-    this.#boardPoints = [...this.#pointsModel.points];
-    this.#sourcedPoints = [...this.#pointsModel.points];
+    const points = this.#pointsModel.points;
+    this.#boardPoints = [...points];
+    this.#sourcedPoints = [...points];
 
     this.#renderBoard();
   }

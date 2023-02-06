@@ -1,13 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo} from '../utils.js';
-// import {getOffersByType, getDestination} from '../mock/mock-point.js';
 
-// const renderOfferItem = (offers) =>
-//   offers.map((offer) => `<li class="event__offer">
-//   <span class="event__offer-title">${offer.title}</span>
-//     &plus;&euro;&nbsp;
-//   <span class="event__offer-price">${offer.price}</span>
-// </li>`).join('');
 function renderOfferItem(offer) {
   return `<li class="event__offer">
   <span class="event__offer-title">${offer.title}</span>
@@ -22,7 +15,6 @@ function createPointTemplate (point) {
   const dateTimeFrom = humanizePointTimeFrom(date);
   const dateTimeTo = humanizePointTimeTo(dateTo);
   const offersTemplate = point.offers.map(renderOfferItem).join('\n');
-  // const offersForType = getOffersByType(point);
 
   return (
     `<li class="trip-events__item">
@@ -44,7 +36,7 @@ function createPointTemplate (point) {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-      ${offersTemplate}
+        ${offersTemplate}
       </ul>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
@@ -54,7 +46,7 @@ function createPointTemplate (point) {
   );
 }
 
-export default class PointView extends AbstractView{
+export default class PointView extends AbstractView {
   #handleEditClick = null;
   #point = null;
 

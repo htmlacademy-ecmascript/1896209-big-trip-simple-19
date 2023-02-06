@@ -1,19 +1,18 @@
-import { offers } from '../mock/mock-point.js';
+import { offersByType } from '../mock/mock-point.js';
 
 export default class OffersModel {
-  #offersByType = [...offers];
+  #offersByType = [...offersByType];
 
   get offers() {
     return [...this.#offersByType];
   }
 
   getByType(type) {
-    return this.#offersByType.find((offer) => offer.type === type).offers;
+    return this.#offersByType.find((offer) => offer.type === type)?.offers;
   }
 
   getByTypeAndId(id, type) {
-    return this.getByType(type).find((offer) => offer.id === id);
+    return this.getByType(type)?.find((offer) => offer.id === id);
   }
-
 
 }
