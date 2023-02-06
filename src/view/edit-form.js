@@ -1,5 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 function renderOfferForType(offer, checked) {
   return `<div class="event__offer-selector">
@@ -119,6 +122,7 @@ export default class EditFormView extends AbstractStatefulView {
   #handleFormSubmit = null;
   #destinations = null;
   #offersByType = null;
+  #datepicker = null;
 
   constructor({point, offersByType, destinations, onFormSubmit}) {
     super();
@@ -128,6 +132,15 @@ export default class EditFormView extends AbstractStatefulView {
     this.#offersByType = offersByType;
 
     this._restoreHandlers();
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepicker) {
+      this.#datepicker.destroy();
+      this.#datepicker = null;
+    }
   }
 
   get template() {
@@ -158,6 +171,8 @@ export default class EditFormView extends AbstractStatefulView {
         el.addEventListener('change', this.#eventChangeHandler);
       });
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#handleEventInput);
+
+    this.#setDatepicker();
   };
 
   #parseStateToPoint(state) {
@@ -174,5 +189,24 @@ export default class EditFormView extends AbstractStatefulView {
       type: evt.target.value
     });
   };
+
+  #dueDateChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #setDatepicker() {
+    if (this._state.isDateFrom) {
+      this.#datepicker = flatpickr(
+        this.element.querySelector('.event__input--time'),
+        {
+          dateFormat: 'j F',
+          defaultDate: this._state.dateFrom,
+          onChange: this.#dueDateChangeHandler,
+        },
+      );
+    }
+  }
 
 }

@@ -93,9 +93,9 @@ export default class PointPresenter {
     this.#replacePointToForm();
   };
 
-  #handleFormSubmit = (state) => {
-    // eslint-disable-next-line no-unused-vars
-    const newType = state.type;
+  #handleFormSubmit = () => {
+    // // eslint-disable-next-line no-unused-vars
+    // const newType = state.type;
     this.#replaceFormToPoint();
   };
 }
