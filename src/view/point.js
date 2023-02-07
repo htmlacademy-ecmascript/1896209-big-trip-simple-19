@@ -12,7 +12,7 @@ function renderOfferItem(offer) {
 function createPointTemplate (point) {
   const {dateFrom, dateTo} = point;
   const date = humanizePointDate(dateFrom);
-  const dateTimeFrom = humanizePointTimeFrom(date);
+  const dateTimeFrom = humanizePointTimeFrom(dateFrom);
   const dateTimeTo = humanizePointTimeTo(dateTo);
   const offersTemplate = point.offers.map(renderOfferItem).join('\n');
 
@@ -26,9 +26,9 @@ function createPointTemplate (point) {
       <h3 class="event__title">${point.type} ${point.destinations.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">${dateTimeFrom}</time>
+          <time class="event__start-time" datetime="${dateTimeFrom}">${dateTimeFrom}</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">${dateTimeTo}</time>
+          <time class="event__end-time" datetime="${dateTimeTo}">${dateTimeTo}</time>
         </p>
       </div>
       <p class="event__price">
