@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils.js';
+import {humanizePointDateTimeFrom, humanizePointDateTimeTo} from '../utils/utils.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 

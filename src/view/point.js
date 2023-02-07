@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo} from '../utils.js';
+import {humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo} from '../utils/utils.js';
 
 function renderOfferItem(offer) {
   return `<li class="event__offer">

@@ -1,4 +1,3 @@
-// const TYPE = ['taxi', 'ship', 'flight'];
 const TYPE = ['bus', 'taxi', 'drive'];
 
 const SortType = {
@@ -6,4 +5,21 @@ const SortType = {
   PRICE_DOWN: 'price-down',
 };
 
-export {TYPE, SortType};
+const FilterType = {
+  EVERYTHING: 'EVERYTHING',
+  FUTURE: 'FUTURE'
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  CREATE_POINT: 'CREATE_POINT',
+  REMOVE_POINT: 'REMOVE_POINT',
+};
+
+export {TYPE, SortType, FilterType, UpdateType, UserAction};

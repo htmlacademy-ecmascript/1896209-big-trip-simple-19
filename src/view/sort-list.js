@@ -1,11 +1,11 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {SortType} from '../const.js';
 
-function createSortListTemplate () {
+function createSortListTemplate (currentSortType) {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
   <div class="trip-sort__item  trip-sort__item--day">
-    <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" data-sort-type="${SortType.DATE_DOWN}" checked>
+    <input id="sort-day" class="trip-sort__input ${currentSortType === SortType.DATE_DOWN ? 'trip-sort__input--active' : ''} visually-hidden" type="radio" name="trip-sort" value="sort-day" data-sort-type="${SortType.DATE_DOWN}" checked>
     <label class="trip-sort__btn" for="sort-day">Day</label>
   </div>
 
@@ -20,7 +20,7 @@ function createSortListTemplate () {
   </div>
 
   <div class="trip-sort__item  trip-sort__item--price">
-    <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price" data-sort-type="${SortType.PRICE_DOWN}">
+    <input id="sort-price" class="trip-sort__input ${currentSortType === SortType.PRICE_DOWN ? 'trip-sort__input--active' : ''}  visually-hidden" type="radio" name="trip-sort" value="sort-price" data-sort-type="${SortType.PRICE_DOWN}">
     <label class="trip-sort__btn" for="sort-price">Price</label>
   </div>
 
@@ -34,16 +34,18 @@ function createSortListTemplate () {
 
 export default class SortListView extends AbstractView {
   #handleSortTypeChange = null;
+  #currentSortType = null;
 
-  constructor({onSortTypeChange}) {
+  constructor({currentSortType, onSortTypeChange}) {
     super();
     this.#handleSortTypeChange = onSortTypeChange;
+    this.#currentSortType = currentSortType;
 
     this.element.addEventListener('click', this.#sortTypeChangeHandler);
   }
 
   get template() {
-    return createSortListTemplate();
+    return createSortListTemplate(this.#currentSortType);
   }
 
   #sortTypeChangeHandler = (evt) => {

@@ -3,6 +3,7 @@ import PointView from '../view/point.js';
 import EditFormView from '../view/edit-form.js';
 import OffersModel from '../model/offers-model.js';
 import DestinationsModel from '../model/destination-model.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -12,6 +13,7 @@ const Mode = {
 export default class PointPresenter {
   #pointListContainer = null;
   #setDefaultView = null;
+  #handleDataChange = null;
 
   #pointComponent = null;
   #pointEditComponent = null;
@@ -22,9 +24,10 @@ export default class PointPresenter {
   #offersModel = new OffersModel();
   #destinationsModel = new DestinationsModel();
 
-  constructor({pointListContainer, setDefaultView}) {
+  constructor({pointListContainer, setDefaultView, onDataChange}) {
     this.#pointListContainer = pointListContainer;
     this.#setDefaultView = setDefaultView;
+    this.#handleDataChange = onDataChange;
   }
 
   init(point) {
@@ -41,7 +44,8 @@ export default class PointPresenter {
       point: this.#point,
       onFormSubmit: this.#handleFormSubmit,
       offersByType: this.#offersModel.offers,
-      destinations: this.#destinationsModel.destinations
+      destinations: this.#destinationsModel.destinations,
+      onDeleteClick: this.#handleDeleteClick
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -93,9 +97,20 @@ export default class PointPresenter {
     this.#replacePointToForm();
   };
 
-  #handleFormSubmit = () => {
-    // // eslint-disable-next-line no-unused-vars
-    // const newType = state.type;
+  #handleFormSubmit = (point) => {
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point
+    );
     this.#replaceFormToPoint();
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.REMOVE_POINT,
+      UpdateType.MINOR,
+      point
+    );
   };
 }

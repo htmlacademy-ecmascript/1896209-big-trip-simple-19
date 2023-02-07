@@ -1,10 +1,12 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createFilterListTemplate () {
+function createFilterListTemplate (filter, currentFilterType) {
+  const {type, name, count} = filter;
   return (
     `<form class="trip-filters" action="#" method="get">
       <div class="trip-filters__filter">
-        <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything">
+        <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}" ${type === currentFilterType ? 'checked' : ''}
+        ${count === 0 ? 'disabled' : ''}>
         <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
       </div>
 
