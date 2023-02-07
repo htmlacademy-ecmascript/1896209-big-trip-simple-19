@@ -1,6 +1,8 @@
 import {render, replace, remove} from '../framework/render.js';
 import PointView from '../view/point.js';
 import EditFormView from '../view/edit-form.js';
+import OffersModel from '../model/offers-model.js';
+import DestinationsModel from '../model/destination-model.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -16,6 +18,9 @@ export default class PointPresenter {
 
   #point = null;
   #mode = Mode.DEFAULT;
+
+  #offersModel = new OffersModel();
+  #destinationsModel = new DestinationsModel();
 
   constructor({pointListContainer, setDefaultView}) {
     this.#pointListContainer = pointListContainer;
@@ -35,6 +40,8 @@ export default class PointPresenter {
     this.#pointEditComponent = new EditFormView({
       point: this.#point,
       onFormSubmit: this.#handleFormSubmit,
+      offersByType: this.#offersModel.offers,
+      destinations: this.#destinationsModel.destinations
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -87,6 +94,8 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = () => {
+    // // eslint-disable-next-line no-unused-vars
+    // const newType = state.type;
     this.#replaceFormToPoint();
   };
 }

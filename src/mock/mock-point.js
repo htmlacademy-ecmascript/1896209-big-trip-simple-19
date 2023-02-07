@@ -1,5 +1,4 @@
-import {getRandomArrayElement, getRandomPositiveInteger} from '../utils.js';
-import {TYPE} from '../const.js';
+import {getRandomPositiveInteger} from '../utils.js';
 
 const destinations = [
   {
@@ -10,6 +9,10 @@ const destinations = [
       {
         src: `https://loremflickr.com/248/152?random=${getRandomPositiveInteger(1,10)}`,
         description: 'Chamonix parliament building'
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomPositiveInteger(1,10)}`,
+        description: 'Aliquam erat volutpat.'
       }
     ]
   },
@@ -32,12 +35,16 @@ const destinations = [
       {
         src: `https://loremflickr.com/248/152?random=${getRandomPositiveInteger(1,10)}`,
         description: 'Aliquam erat volutpat.'
+      },
+      {
+        src: `https://loremflickr.com/248/152?random=${getRandomPositiveInteger(1,10)}`,
+        description: 'In rutrum ac purus sit amet tempus.'
       }
     ]
   }
 ];
 
-const offersByType = [
+export const offersByType = [
   {
     type: 'taxi',
     offers: [
@@ -59,7 +66,7 @@ const offersByType = [
     ]
   },
   {
-    type: 'flight',
+    type: 'bus',
     offers: [
       {
         id: 0,
@@ -79,7 +86,7 @@ const offersByType = [
     ]
   },
   {
-    type: 'ship',
+    type: 'drive',
     offers: [
       {
         id: 0,
@@ -103,45 +110,31 @@ const offersByType = [
 const mockPoints = [
   {
     basePrice: 1100,
-    dateFrom: '2019-07-10T06:30:00.000Z',
-    dateTo: '2019-07-15T11:22:13.375Z',
+    dateFrom: '2019-03-18T12:30',
+    dateTo: '2019-03-18T15:30',
     id: '0',
-    type: getRandomArrayElement(TYPE),
-    offers: [0, 1, 2],
-    destination: 0
+    type: 'taxi',
+    offers: [0, 1],
+    destinations: 0,
   },
   {
     basePrice: 2100,
-    dateFrom: '2019-07-15T18:22:44.485Z',
-    dateTo: '2019-07-20T12:26:13.575Z',
+    dateFrom: '2019-04-18T10:30',
+    dateTo: '2019-04-20T11:30',
     id: '1',
-    type: getRandomArrayElement(TYPE),
-    offers: [0, 1, 2],
-    destination: 1
+    type: 'bus',
+    offers: [0],
+    destinations: 1,
   },
   {
     basePrice: 3100,
-    dateFrom: '2019-07-20T10:30',
-    dateTo: '2019-07-25T12:30',
+    dateFrom: '2019-03-19T11:30',
+    dateTo: '2019-04-21T17:25',
     id: '2',
-    type: getRandomArrayElement(TYPE),
-    offers: [0, 1, 2],
-    destination: 2
+    type: 'drive',
+    offers: [1],
+    destinations: 2,
   }
 ];
 
-function getRandomPoint() {
-  return getRandomArrayElement(mockPoints);
-}
-
-function getOffersByType (point) {
-  return offersByType.find((offers) => offers.type === point.type);
-}
-
-function getDestination (point) {
-  return destinations.find(
-    (destination) => destination.id === point.destination
-  );
-}
-
-export {getRandomPoint, getOffersByType, getDestination};
+export {mockPoints, destinations};
