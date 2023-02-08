@@ -1,24 +1,19 @@
 import EditFormView from '../view/edit-form.js';
-import { render, remove } from '../framework/render.js';
-import { UpdateType, UserAction } from '../const.js';
-import { nanoid } from 'nanoid';
-import AbstractView from '../framework/view/abstract-view.js';
+import {render, remove} from '../framework/render.js';
+import {UpdateType, UserAction} from '../const.js';
 
-export default class NewPointPresenter extends AbstractView {
-  #pointListContainer = null;
+export default class NewPointPresenter {
   #newPointFormComponent = null;
-  #renderPositionComponent = null;
+  #position = null;
   #offersModel = null;
   #destinationsModel = null;
   #handleDataChange = null;
   #handleDestroy = null;
 
-  constructor({ pointListContainer, onDestroy, onDataChange, renderPositionComponent, offersModel, destinationsModel }) {
-    super();
-    this.#pointListContainer = pointListContainer;
+  constructor({onDestroy, onDataChange, position, offersModel, destinationsModel}) {
     this.#handleDestroy = onDestroy;
     this.#handleDataChange = onDataChange;
-    this.#renderPositionComponent = renderPositionComponent;
+    this.#position = position;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
   }
@@ -29,15 +24,30 @@ export default class NewPointPresenter extends AbstractView {
     }
 
     this.#newPointFormComponent = new EditFormView({
-      onFormSubmit: this.#handlerFormSubmit,
-      onDeleteClick: this.#handlerRemove,
+      onSubmit: this.#handlerFormSubmit,
+      onRemove: this.#handlerRemove,
       offersByType: this.#offersModel.offers,
       destinations: this.#destinationsModel.destinations
     });
-    //{point, offersByType, destinations, onFormSubmit, onDeleteClick}
-    // eslint-disable-next-line no-console
-    console.log(this.#renderPositionComponent.component);
-    render(this.#newPointFormComponent, this.#renderPositionComponent.component, this.#renderPositionComponent.position);
+
+    render(this.#newPointFormComponent, this.#position.component, this.#position.position);
+  }
+
+  setSaving() {
+    this.#newPointFormComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#newPointFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+      });
+    };
+    this.#newPointFormComponent.shake(resetFormState);
   }
 
   destroy() {
@@ -50,14 +60,15 @@ export default class NewPointPresenter extends AbstractView {
     document.removeEventListener('keydown', this.#escHandler);
   }
 
-  #handlerFormSubmit = (point) => {
-    point.id = nanoid();
-    this.#handleDataChange(
+  #handlerFormSubmit = async (point) => {
+    const isSuccess = await this.#handleDataChange(
       UserAction.CREATE_POINT,
       UpdateType.MAJOR,
       point
     );
-    this.destroy();
+    if (isSuccess) {
+      this.destroy();
+    }
   };
 
   #handlerRemove = () => {

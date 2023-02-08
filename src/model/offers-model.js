@@ -1,18 +1,20 @@
-import { offersByType } from '../mock/mock-point.js';
-
 export default class OffersModel {
-  #offersByType = [...offersByType];
+  #offersByType = [];
+  #apiService = null;
+
+  constructor({apiService}) {
+    this.#apiService = apiService;
+  }
 
   get offers() {
-    return [...this.#offersByType];
+    return this.#offersByType;
+  }
+
+  async init() {
+    this.#offersByType = await this.#apiService.offers;
   }
 
   getByType(type) {
-    return this.#offersByType.find((offer) => offer.type === type)?.offers;
+    return this.offers.find((offer) => offer.type === type).offers;
   }
-
-  getByTypeAndId(id, type) {
-    return this.getByType(type)?.find((offer) => offer.id === id);
-  }
-
 }

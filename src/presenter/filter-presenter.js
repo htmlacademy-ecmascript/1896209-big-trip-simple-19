@@ -8,42 +8,27 @@ export default class FilterPresenter {
   #filterModel = null;
   #filterComponent = null;
   #pointsModel = null;
+  #filterType = FilterType.EVERYTHING;
 
-  constructor({ filterContainer, filterModel, pointsModel }) {
+  constructor({filterContainer, filterModel, pointsModel}) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#pointsModel = pointsModel;
 
-    this.#filterModel.addObserver(this.#handleModelEvent);
-    this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleFilterModelEvent);
+    this.#pointsModel.addObserver(this.#handlePointsModelEvent);
   }
 
-  get filters() {
-    const points = this.#pointsModel.points;
-
-    return [
-      {
-        type: FilterType.EVERYTHING,
-        name: 'Everything',
-        count: filter[FilterType.EVERYTHING](points).length,
-      },
-      {
-        type: FilterType.FUTURE,
-        name: 'Future',
-        count: filter[FilterType.FUTURE](points).length,
-      },
-    ];
-  }
-
-  //init(filterType = FilterType.EVERYTHING) {
-  init() {
-    const filters = this.filters;
+  init(filterType = FilterType.EVERYTHING) {
+    this.#filterType = filterType;
     const prevFilterComponent = this.#filterComponent;
-
+    const filterFuture = filter[FilterType.FUTURE];
+    const isDisabledFuture = filterType === FilterType.EVERYTHING &&
+      filterFuture(this.#pointsModel.points).length === 0;
     this.#filterComponent = new FilterListView({
-      filters,
-      currentFilterType: this.#filterModel.filter,
-      onFilterTypeChange: this.#handleFilterTypeChange
+      onChange: this.#handleFilterChange,
+      filterType: filterType,
+      isDisabledFuture: isDisabledFuture
     });
 
     if (!prevFilterComponent) {
@@ -54,20 +39,20 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   }
 
-  #handleFilterTypeChange = (filterType) => {
-    if (this.#filterModel.filter === filterType) {
-      return;
-    }
-
+  #handleFilterChange = (filterType) => {
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 
-  // #handleModelEvent = (_updateType, filterType) => {
-  //   this.init(filterType);
-  // };
-
-  #handleModelEvent = () => {
-    this.init();
+  #handleFilterModelEvent = (_updateType, filterType) => {
+    this.init(filterType);
   };
 
+  #handlePointsModelEvent = (updateType) => {
+    switch (updateType) {
+      case UpdateType.MAJOR:
+      case UpdateType.INIT:
+        this.init(this.#filterType);
+        break;
+    }
+  };
 }
