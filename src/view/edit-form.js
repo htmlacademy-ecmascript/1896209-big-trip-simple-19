@@ -28,16 +28,48 @@ function createDestinationTemplate(destinations){
   return ` <option value="${destinations.name}"></option>`;
 }
 
-function createEditFormTemplate (state, offersByType, destinations) {
-  const offersTemplate = offersByType.find((offers) => state.type === offers.type)
-    .offers
-    .map((offers) => renderOfferForType(offers, state.offers.some((pointOffer) => pointOffer.id === offers.id)))
+function createOffersContainer(offersTemplate) {
+  return `<section class="event__section  event__section--offers">
+  <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+  <div class="event__available-offers">
+    ${offersTemplate}
+  </div>
+</section>`;
+}
+
+function createDestinationContainer(destination) {
+  const picturesTemplate = destination
+    .pictures
+    .map((picture) => createPictureTemplate(picture))
     .join('\n');
-  const eventTypeTemplate = offersByType.map((offer) => offer.type).map((type)=> getEventTypeItem(type)).join('\n');
+  return `<section class="event__section  event__section--destination">
+  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+  <p class="event__destination-description">${destination.description}</p>
+</section>
+<div class="event__photos-container">
+  <div class="event__photos-tape">
+    ${picturesTemplate}
+  </div>`;
+}
 
-  const picturesTemplate = state.destinations.pictures.map((picture) => createPictureTemplate(picture)).join('\n');
-
+function createEditFormTemplate (state, offersByType, destinations) {
+  const offers = offersByType.find((offer) => state.type === offer.type).offers;
+  let offersTemplate = '';
+  if (offers.length > 0) {
+    const offersTemplateList = offers.map((offer) => renderOfferForType(offer, state.offers.some((pointOffer) => pointOffer.id === offer.id)))
+      .join('\n');
+    offersTemplate = createOffersContainer(offersTemplateList);
+  }
+  const eventTypeTemplate = offersByType.map((offer) => offer.type).map((type) => getEventTypeItem(type)).join('\n');
+  let selectedDestination = null;
+  if (state.destination) {
+    selectedDestination = destinations.find((destination) => destination.id === state.destination.id);
+  }
   const destinationsTemplate = destinations.map((destination) => createDestinationTemplate(destination)).join('\n');
+  const selectedDestinationTemplate = selectedDestination ? createDestinationContainer(selectedDestination) : '';
+  const destinationName = selectedDestination ? selectedDestination.name : '';
+  // eslint-disable-next-line no-console
+  console.log(state);
 
   return (
     `<li class = "trip-events__item">
@@ -62,7 +94,7 @@ function createEditFormTemplate (state, offersByType, destinations) {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${state.type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${state.destinations.name}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${destinationsTemplate}
         </datalist>
@@ -91,27 +123,9 @@ function createEditFormTemplate (state, offersByType, destinations) {
       </button>
     </header>
     <section class="event__details">
-      <section class="event__section  event__section--offers">
-        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-        <div class="event__available-offers">
-        ${offersTemplate}
-        </div>
+    ${offersTemplate}
+    ${selectedDestinationTemplate}
       </section>
-
-      <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${state.destinations.description}</p>
-      </section>
-
-      <div class="event__photos-container">
-        <div class="event__photos-tape">
-          ${picturesTemplate}
-        </div>
-      </div>
-
-
-    </section>
   </form>
     </li>`
   );
@@ -119,18 +133,23 @@ function createEditFormTemplate (state, offersByType, destinations) {
 
 export default class EditFormView extends AbstractStatefulView {
   #handleFormSubmit = null;
+  #handleDeleteClick = null;
+  #handleSubmit = null;
   #destinations = null;
   #offersByType = null;
   #datepickerFrom = null;
   #datepickerTo = null;
 
-
-  constructor({point, offersByType, destinations, onFormSubmit}) {
+  //is for edit isForEdit
+  constructor({point, offersByType, destinations, onFormSubmit, onDeleteClick, onSubmit}) {
     super();
-    this._setState(this.#parsePointToState(point));
+    const newState = point ? this.#parsePointToState(point) : this.#createStateNewForm();
+    this._setState(newState);
     this.#handleFormSubmit = onFormSubmit;
+    this.#handleDeleteClick = onDeleteClick;
     this.#destinations = destinations;
     this.#offersByType = offersByType;
+    this.#handleSubmit = onSubmit;
 
     this._restoreHandlers();
   }
@@ -151,7 +170,8 @@ export default class EditFormView extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#parseStateToPoint(this._state));
+    const point = this.#parseStateToPoint();
+    this.#handleSubmit(point);
   };
 
   #handleEventInput = (evt) => {
@@ -173,7 +193,7 @@ export default class EditFormView extends AbstractStatefulView {
         el.addEventListener('change', this.#eventChangeHandler);
       });
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#handleEventInput);
-
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
     this.#setDatepickerFrom();
     this.#setDatepickerTo();
   };
@@ -186,11 +206,27 @@ export default class EditFormView extends AbstractStatefulView {
     return {...point};
   }
 
+  #createStateNewForm() {
+    return {
+      type: 'bus',
+      offers: [],
+      start: new Date(),
+      end: new Date(),
+      isSaving: false,
+      isDisabled: false
+    };
+  }
+
   #eventChangeHandler = (evt) => {
     evt.preventDefault();
     this.updateElement({
       type: evt.target.value
     });
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteClick(EditFormView.#parseStateToPoint(this._state));
   };
 
   #dueDateChangeHandler = ([userDate]) => {

@@ -2,8 +2,10 @@ import EditFormView from '../view/edit-form.js';
 import { render, remove } from '../framework/render.js';
 import { UpdateType, UserAction } from '../const.js';
 import { nanoid } from 'nanoid';
+import AbstractView from '../framework/view/abstract-view.js';
 
-export default class NewPointPresenter {
+export default class NewPointPresenter extends AbstractView {
+  #pointListContainer = null;
   #newPointFormComponent = null;
   #renderPositionComponent = null;
   #offersModel = null;
@@ -11,22 +13,30 @@ export default class NewPointPresenter {
   #handleDataChange = null;
   #handleDestroy = null;
 
-  constructor({ onDestroy, renderPositionComponent, offersModel, destinationsModel, onDataChange }) {
+  constructor({ pointListContainer, onDestroy, onDataChange, renderPositionComponent, offersModel, destinationsModel }) {
+    super();
+    this.#pointListContainer = pointListContainer;
+    this.#handleDestroy = onDestroy;
+    this.#handleDataChange = onDataChange;
     this.#renderPositionComponent = renderPositionComponent;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
-    this.#handleDataChange = onDataChange;
-    this.#handleDestroy = onDestroy;
   }
 
   init() {
+    if (this.#newPointFormComponent !== null) {
+      return;
+    }
+
     this.#newPointFormComponent = new EditFormView({
-      onSubmit: this.#handlerFormSubmit,
-      onRemove: this.#handlerRemove,
+      onFormSubmit: this.#handlerFormSubmit,
+      onDeleteClick: this.#handlerRemove,
       offersByType: this.#offersModel.offers,
       destinations: this.#destinationsModel.destinations
     });
-
+    //{point, offersByType, destinations, onFormSubmit, onDeleteClick}
+    // eslint-disable-next-line no-console
+    console.log(this.#renderPositionComponent.component);
     render(this.#newPointFormComponent, this.#renderPositionComponent.component, this.#renderPositionComponent.position);
   }
 
@@ -43,7 +53,7 @@ export default class NewPointPresenter {
   #handlerFormSubmit = (point) => {
     point.id = nanoid();
     this.#handleDataChange(
-      UserAction.ADD_POINT,
+      UserAction.CREATE_POINT,
       UpdateType.MAJOR,
       point
     );
