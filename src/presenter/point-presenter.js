@@ -1,9 +1,7 @@
 import {render, replace, remove} from '../framework/render.js';
 import PointView from '../view/point.js';
 import EditFormView from '../view/edit-form.js';
-import OffersModel from '../model/offers-model.js';
-import DestinationsModel from '../model/destination-model.js';
-import {UserAction, UpdateType} from '../const.js';
+import {UpdateType, UserAction} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -16,55 +14,104 @@ export default class PointPresenter {
   #handleDataChange = null;
 
   #pointComponent = null;
-  #pointEditComponent = null;
+  #pointFormComponent = null;
 
   #point = null;
   #mode = Mode.DEFAULT;
 
-  #offersModel = new OffersModel();
-  #destinationsModel = new DestinationsModel();
+  #offersModel = null;
+  #destinationsModel = null;
 
-  constructor({pointListContainer, setDefaultView, onDataChange}) {
+
+  constructor({pointListContainer, setDefaultView, onDataChange, offersModel, destinationsModel}) {
     this.#pointListContainer = pointListContainer;
     this.#setDefaultView = setDefaultView;
     this.#handleDataChange = onDataChange;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
   }
 
   init(point) {
     this.#point = point;
 
     const prevPointComponent = this.#pointComponent;
-    const prevPointEditComponent = this.#pointEditComponent;
+    const prevEditFormComponent = this.#pointFormComponent;
 
     this.#pointComponent = new PointView({
       point: this.#point,
-      onEditClick: this.#handleEditClick,
+      onRollUp: this.#handlerRollUp
     });
-    this.#pointEditComponent = new EditFormView({
+    this.#pointFormComponent = new EditFormView({
       point: this.#point,
-      onFormSubmit: this.#handleFormSubmit,
+      onFormSubmit: this.#handlerFormSubmit,
       offersByType: this.#offersModel.offers,
       destinations: this.#destinationsModel.destinations,
-      onDeleteClick: this.#handleDeleteClick
+      onDeleteClick: this.#handlerRemove,
+      onRollDown: this.#handlerRollDown
     });
 
-    if (prevPointComponent === null || prevPointEditComponent === null) {
-      render(this.#pointComponent, this.#pointListContainer);
+    if (prevPointComponent === null || prevEditFormComponent === null) {
+      render(this.#pointComponent, this.#pointListContainer.element);
       return;
     }
 
     if (this.#mode === Mode.DEFAULT) {
       replace(this.#pointComponent, prevPointComponent);
     }
-
     if (this.#mode === Mode.EDITING) {
-      replace(this.#pointEditComponent, prevPointEditComponent);
+      replace(this.#pointFormComponent, prevEditFormComponent);
+    }
+    remove(prevPointComponent);
+    remove(prevEditFormComponent);
+  }
+
+  #replacePointToForm() {
+    replace(this.#pointFormComponent, this.#pointComponent);
+    this.#setDefaultView();
+    this.#mode = Mode.EDITING;
+  }
+
+  #replaceFormToPoint() {
+    replace(this.#pointComponent, this.#pointFormComponent);
+    this.#mode = Mode.DEFAULT;
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#pointFormComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+    const resetFormState = () => {
+      this.#pointFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+    this.#pointFormComponent.shake(resetFormState);
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#pointFormComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
     }
   }
 
   destroy() {
     remove(this.#pointComponent);
-    remove(this.#pointEditComponent);
+    remove(this.#pointFormComponent);
   }
 
   resetView() {
@@ -73,51 +120,45 @@ export default class PointPresenter {
     }
   }
 
-  #replacePointToForm () {
-    this.#setDefaultView();
-    replace(this.#pointEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.EDITING;
-  }
-
-  #replaceFormToPoint () {
-    replace(this.#pointComponent, this.#pointEditComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.DEFAULT;
-  }
-
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
+  #handlerFormSubmit = async (point) => {
+    let updateType = UpdateType.PATCH;
+    if (this.#point.price !== point.price || this.#point.start !== point.start || this.#point.end !== point.end) {
+      updateType = UpdateType.MINOR;
+    }
+    const isSuccess = await this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      updateType,
+      point
+    );
+    if (isSuccess) {
       this.#replaceFormToPoint();
+      document.removeEventListener('keydown', this.#escHandler);
     }
   };
 
-  #handleEditClick = () => {
-    this.#replacePointToForm();
-  };
-
-  #handleFormSubmit = (update) => {
-    // Проверяем, поменялись ли в задаче данные, которые попадают под фильтрацию,
-    // а значит требуют перерисовки списка - если таких нет, это PATCH-обновление
-    const isMinorUpdate =
-      !isDatesEqual(this.#point.dateTo, update.dateTo) ||
-      !isDatesEqual(this.#point.dateFrom, update.dateFrom) ||
-      isPointRepeating(this.#point.repeating) !== isPointRepeating(update.repeating);
-
-    this.#handleDataChange(
-      UserAction.UPDATE_TASK,
-      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
-      update,
-    );
-    this.#replaceFormToPoint();
-  };
-
-  #handleDeleteClick = (point) => {
+  #handlerRemove = (point) => {
     this.#handleDataChange(
       UserAction.REMOVE_POINT,
       UpdateType.MINOR,
       point
     );
   };
+
+  #handlerRollDown = () => {
+    this.#replaceFormToPoint();
+    document.removeEventListener('keydown', this.#escHandler);
+  };
+
+  #handlerRollUp = () => {
+    this.#replacePointToForm();
+    document.addEventListener('keydown', this.#escHandler);
+  };
+
+  #escHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      this.#replaceFormToPoint();
+      document.removeEventListener('keydown', this.#escHandler);
+    }
+  };
+
 }

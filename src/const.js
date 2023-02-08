@@ -1,8 +1,8 @@
-const TYPE = ['bus', 'taxi', 'drive'];
+const END_POINT = 'https://19.ecmascript.pages.academy/big-trip-simple';
 
 const SortType = {
-  DATE_DOWN: 'date-down',
-  PRICE_DOWN: 'price-down',
+  PRICE: 'basePrice',
+  DAY: 'day'
 };
 
 const FilterType = {
@@ -14,6 +14,8 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
+  ERROR: 'ERROR'
 };
 
 const UserAction = {
@@ -22,4 +24,9 @@ const UserAction = {
   REMOVE_POINT: 'REMOVE_POINT',
 };
 
-export {TYPE, SortType, FilterType, UpdateType, UserAction};
+const MessagesType = {
+  ...FilterType,
+  ERROR: 'ERROR'
+};
+
+export {SortType, UpdateType, UserAction, FilterType, MessagesType, END_POINT};
