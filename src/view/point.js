@@ -1,7 +1,9 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo} from '../utils.js';
+import {humanizePointDate, humanizePointTimeFrom, humanizePointTimeTo} from '../utils/utils.js';
 
 function renderOfferItem(offer) {
+  // eslint-disable-next-line no-console
+  console.log(offer);
   return `<li class="event__offer">
   <span class="event__offer-title">${offer.title}</span>
   &plus;&euro;&nbsp;
@@ -14,8 +16,9 @@ function createPointTemplate (point) {
   const date = humanizePointDate(dateFrom);
   const dateTimeFrom = humanizePointTimeFrom(dateFrom);
   const dateTimeTo = humanizePointTimeTo(dateTo);
+  // eslint-disable-next-line no-console
+  console.log(point);
   const offersTemplate = point.offers.map(renderOfferItem).join('\n');
-
   return (
     `<li class="trip-events__item">
     <div class="event">
@@ -62,8 +65,7 @@ export default class PointView extends AbstractView {
     return createPointTemplate(this.#point);
   }
 
-  #editClickHandler = (evt) => {
-    evt.preventDefault();
+  #editClickHandler = () => {
     this.#handleEditClick();
   };
 }
