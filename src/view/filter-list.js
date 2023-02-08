@@ -25,13 +25,13 @@ function createFilterTemplate (filterType, isDisabledFuture) {
 }
 
 export default class FilterListView extends AbstractView {
-  #handleFilterTypeChange = null;
+  #handleChangeFilter = null;
   #filterType = null;
   #isDisabledFuture = null;
 
   constructor({onChange, filterType, isDisabledFuture}) {
     super();
-    this.#handleFilterTypeChange = onChange;
+    this.#handleChangeFilter = onChange;
     this.#filterType = filterType;
     this.#isDisabledFuture = isDisabledFuture;
 
@@ -43,7 +43,7 @@ export default class FilterListView extends AbstractView {
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFilterTypeChange(evt.target.value);
+    this.#handleChangeFilter(evt.target.value);
   };
 
   get template() {

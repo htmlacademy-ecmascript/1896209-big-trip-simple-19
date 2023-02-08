@@ -4,7 +4,8 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
 
-function renderOfferForType (offer, checked, isDisabled) {
+
+function renderOfferForType(offer, checked, isDisabled) {
   return `<div class="event__offer-selector">
   <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer" ${checked ? 'checked' : ''} data-offer-id='${offer.id}'  ${isDisabled ? 'disabled' : ''}>
   <label class="event__offer-label" for="event-offer-${offer.id}">
@@ -15,22 +16,22 @@ function renderOfferForType (offer, checked, isDisabled) {
 </div>`;
 }
 
-function getEventTypeItem (type) {
+function getEventTypeItem(type) {
   return `<div class="event__type-item">
 <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
 <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${ucFirst(type)}</label>
 </div>`;
 }
 
-function createPictureTemplate (picture) {
+function createPictureTemplate(picture) {
   return `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`;
 }
 
-function createDestinationTemplate (destination) {
+function createDestinationTemplate(destination) {
   return ` <option value="${he.encode(destination.name)}"></option>`;
 }
 
-function createOffersContainer (offersTemplate) {
+function createOffersContainer(offersTemplate) {
   return `<section class="event__section  event__section--offers">
   <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
@@ -40,8 +41,7 @@ function createOffersContainer (offersTemplate) {
 </section>`;
 }
 
-function createDestinationContainer
-(destination) {
+function createDestinationContainer(destination) {
   const picturesTemplate = destination
     .pictures
     .map((picture) => createPictureTemplate(picture))
@@ -60,7 +60,7 @@ const rollButton = `<button class="event__rollup-btn" type="button">
 <span class="visually-hidden">Open event</span>
 </button>`;
 
-function createEditFormTemplate (state, offersByType, destinations) {
+function createFormTemplate(state, offersByType, destinations) {
   const offers = offersByType.find((offer) => state.type === offer.type).offers;
   let offersTemplate = '';
   if (offers.length > 0) {
@@ -76,11 +76,10 @@ function createEditFormTemplate (state, offersByType, destinations) {
   }
   const destinationsTemplate = destinations.map((destination) => createDestinationTemplate(destination)).join('\n');
   const selectedDestinationTemplate = selectedDestination ? createDestinationContainer(selectedDestination) : '';
-  const destinationNameTemplate = destinations.map((destination) => destination.name).join('|');
+  const destinationPattern = destinations.map((destination) => destination.name).join('|');
   const price = state.price ? state.price : 0;
   const deleteName = state.isDeleting ? 'Deleting...' : 'Delete';
   const buttonName = state.id ? deleteName : 'Cancel';
-
   return ` <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
@@ -93,7 +92,9 @@ function createEditFormTemplate (state, offersByType, destinations) {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
+
                 ${eventTypeTemplate}
+
               </fieldset>
             </div>
         </div>
@@ -102,7 +103,7 @@ function createEditFormTemplate (state, offersByType, destinations) {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${state.type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(state.destinationName || '')}" pattern="${destinationNameTemplate}" required list="destination-list-1" ${state.isDisabled ? 'disabled' : ''}>
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(state.destinationName || '')}" pattern="${destinationPattern}" required list="destination-list-1" ${state.isDisabled ? 'disabled' : ''}>
             <datalist id="destination-list-1">
              ${destinationsTemplate}
             </datalist>
@@ -136,18 +137,18 @@ function createEditFormTemplate (state, offersByType, destinations) {
         </form>`;
 }
 
-export default class EditFormView extends AbstractStatefulView {
+export default class FormView extends AbstractStatefulView {
   #DATE_FORMAT = 'j/m/y H:i';
-  #destinations = null;
-  #offersByType = null;
   #handleSubmit = null;
   #handleRollDown = null;
+  #destinations = null;
+  #offersByType = null;
   #nameToDestination = null;
   #datepickerStart = null;
   #datepickerEnd = null;
   #handleRemove = null;
 
-  constructor({point, offersByType, destinations, onSubmit, onRollDown, onRemove}) {
+  constructor({point, onSubmit, onRollDown, offersByType, destinations, onRemove}) {
     super();
     const newState = point ? this.#parsePointToState(point) : this.#createStateNewForm();
     this._setState(newState);
@@ -164,7 +165,7 @@ export default class EditFormView extends AbstractStatefulView {
   }
 
   get template() {
-    return createEditFormTemplate(this._state, this.#offersByType, this.#destinations);
+    return createFormTemplate(this._state, this.#offersByType, this.#destinations);
   }
 
   _restoreHandlers = () => {
@@ -183,8 +184,8 @@ export default class EditFormView extends AbstractStatefulView {
     eventsNodeList.forEach((el) => {
       el.addEventListener('change', this.#eventChangeHandler);
     });
-    this.#setDatepickerFrom();
-    this.#setDatepickerTo();
+    this.#setDatepickerStart();
+    this.#setDatepickerEnd();
   };
 
   removeElement() {
@@ -287,7 +288,7 @@ export default class EditFormView extends AbstractStatefulView {
     });
   };
 
-  #setDatepickerFrom() {
+  #setDatepickerStart() {
     this.#datepickerStart = flatpickr(
       this.element.querySelector('#event-start-time-1'),
       {
@@ -305,7 +306,7 @@ export default class EditFormView extends AbstractStatefulView {
     );
   }
 
-  #setDatepickerTo() {
+  #setDatepickerEnd() {
     this.#datepickerEnd = flatpickr(
       this.element.querySelector('#event-end-time-1'),
       {

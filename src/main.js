@@ -40,7 +40,7 @@ function handleNewPointFormClose() {
 function handleNewPointButtonClick() {
   pointsPresenter.openNewPointForm();
   newPointComponent.element.disabled = true;
-  filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
+  filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
 }
 
 function disableButton() {

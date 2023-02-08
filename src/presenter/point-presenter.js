@@ -10,44 +10,40 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
-  #setDefaultView = null;
+  #pointComponent = null;
+  #editFormComponent = null;
+  #point = null;
+  #offersModel = null;
+  #handleModeChange = null;
+  #mode = Mode.DEFAULT;
+  #destinationsModel = null;
   #handleDataChange = null;
 
-  #pointComponent = null;
-  #pointFormComponent = null;
 
-  #point = null;
-  #mode = Mode.DEFAULT;
-
-  #offersModel = null;
-  #destinationsModel = null;
-
-
-  constructor({pointListContainer, setDefaultView, onDataChange, offersModel, destinationsModel}) {
+  constructor({ pointListContainer, onModeChange, offersModel, destinationsModel, onDataChange }) {
     this.#pointListContainer = pointListContainer;
-    this.#setDefaultView = setDefaultView;
-    this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#handleDataChange = onDataChange;
   }
 
   init(point) {
     this.#point = point;
-
     const prevPointComponent = this.#pointComponent;
-    const prevEditFormComponent = this.#pointFormComponent;
+    const prevEditFormComponent = this.#editFormComponent;
+    this.#editFormComponent = new EditFormView({
+      point: this.#point,
+      onSubmit: this.#handlerFormSubmit,
+      onRollDown: this.#handlerRollDown,
+      onRemove: this.#handlerRemove,
+      offersByType: this.#offersModel.offers,
+      destinations: this.#destinationsModel.destinations
+    });
 
     this.#pointComponent = new PointView({
       point: this.#point,
       onRollUp: this.#handlerRollUp
-    });
-    this.#pointFormComponent = new EditFormView({
-      point: this.#point,
-      onFormSubmit: this.#handlerFormSubmit,
-      offersByType: this.#offersModel.offers,
-      destinations: this.#destinationsModel.destinations,
-      onDeleteClick: this.#handlerRemove,
-      onRollDown: this.#handlerRollDown
     });
 
     if (prevPointComponent === null || prevEditFormComponent === null) {
@@ -59,26 +55,15 @@ export default class PointPresenter {
       replace(this.#pointComponent, prevPointComponent);
     }
     if (this.#mode === Mode.EDITING) {
-      replace(this.#pointFormComponent, prevEditFormComponent);
+      replace(this.#editFormComponent, prevEditFormComponent);
     }
     remove(prevPointComponent);
     remove(prevEditFormComponent);
   }
 
-  #replacePointToForm() {
-    replace(this.#pointFormComponent, this.#pointComponent);
-    this.#setDefaultView();
-    this.#mode = Mode.EDITING;
-  }
-
-  #replaceFormToPoint() {
-    replace(this.#pointComponent, this.#pointFormComponent);
-    this.#mode = Mode.DEFAULT;
-  }
-
   setSaving() {
     if (this.#mode === Mode.EDITING) {
-      this.#pointFormComponent.updateElement({
+      this.#editFormComponent.updateElement({
         isDisabled: true,
         isSaving: true,
       });
@@ -91,18 +76,18 @@ export default class PointPresenter {
       return;
     }
     const resetFormState = () => {
-      this.#pointFormComponent.updateElement({
+      this.#editFormComponent.updateElement({
         isDisabled: false,
         isSaving: false,
         isDeleting: false
       });
     };
-    this.#pointFormComponent.shake(resetFormState);
+    this.#editFormComponent.shake(resetFormState);
   }
 
   setDeleting() {
     if (this.#mode === Mode.EDITING) {
-      this.#pointFormComponent.updateElement({
+      this.#editFormComponent.updateElement({
         isDisabled: true,
         isDeleting: true,
       });
@@ -111,13 +96,24 @@ export default class PointPresenter {
 
   destroy() {
     remove(this.#pointComponent);
-    remove(this.#pointFormComponent);
+    remove(this.#editFormComponent);
   }
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
       this.#replaceFormToPoint();
     }
+  }
+
+  #replacePointToForm() {
+    replace(this.#editFormComponent, this.#pointComponent);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
+  }
+
+  #replaceFormToPoint() {
+    replace(this.#pointComponent, this.#editFormComponent);
+    this.#mode = Mode.DEFAULT;
   }
 
   #handlerFormSubmit = async (point) => {

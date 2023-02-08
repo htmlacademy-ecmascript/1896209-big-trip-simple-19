@@ -26,7 +26,7 @@ export default class FilterPresenter {
     const isDisabledFuture = filterType === FilterType.EVERYTHING &&
       filterFuture(this.#pointsModel.points).length === 0;
     this.#filterComponent = new FilterListView({
-      onChange: this.#handleFilterTypeChange,
+      onChange: this.#handleFilterChange,
       filterType: filterType,
       isDisabledFuture: isDisabledFuture
     });
@@ -39,7 +39,7 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   }
 
-  #handleFilterTypeChange = (filterType) => {
+  #handleFilterChange = (filterType) => {
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 

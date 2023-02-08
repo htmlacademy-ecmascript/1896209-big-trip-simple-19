@@ -1,7 +1,7 @@
 const END_POINT = 'https://19.ecmascript.pages.academy/big-trip-simple';
 
 const SortType = {
-  PRICE: 'basePrice',
+  PRICE: 'price',
   DAY: 'day'
 };
 

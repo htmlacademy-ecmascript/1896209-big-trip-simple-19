@@ -4,16 +4,16 @@ import {UpdateType, UserAction} from '../const.js';
 
 export default class NewPointPresenter {
   #newPointFormComponent = null;
-  #renderPositionComponent = null;
+  #position = null;
   #offersModel = null;
   #destinationsModel = null;
   #handleDataChange = null;
   #handleDestroy = null;
 
-  constructor({onDestroy, onDataChange, renderPositionComponent, offersModel, destinationsModel}) {
+  constructor({onDestroy, onDataChange, position, offersModel, destinationsModel}) {
     this.#handleDestroy = onDestroy;
     this.#handleDataChange = onDataChange;
-    this.#renderPositionComponent = renderPositionComponent;
+    this.#position = position;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
   }
@@ -24,13 +24,13 @@ export default class NewPointPresenter {
     }
 
     this.#newPointFormComponent = new EditFormView({
-      onFormSubmit: this.#handlerFormSubmit,
-      onDeleteClick: this.#handlerRemove,
+      onSubmit: this.#handlerFormSubmit,
+      onRemove: this.#handlerRemove,
       offersByType: this.#offersModel.offers,
       destinations: this.#destinationsModel.destinations
     });
 
-    render(this.#newPointFormComponent, this.#renderPositionComponent.component, this.#renderPositionComponent.position);
+    render(this.#newPointFormComponent, this.#position.component, this.#position.position);
   }
 
   setSaving() {
