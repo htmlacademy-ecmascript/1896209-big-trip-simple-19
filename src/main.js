@@ -4,13 +4,13 @@ import FilterModel from './model/filter-model.js';
 import NewPointButtonView from './view/new-point-button.js';
 import {render} from './framework/render.js';
 import {FilterType, UpdateType, END_POINT} from './const.js';
-import randomstring from 'randomstring';
+import randomString from 'randomString';
 import PointService from './point-service.js';
 import PointsModel from './model/points-model.js';
 import OffersModel from './model/offers-model.js';
 import DestinationsModel from './model/destination-model.js';
 
-const token = `Basic ${randomstring.generate()}`;
+const token = `Basic ${randomString.generate()}`;
 const pointService = new PointService(END_POINT, token);
 const offersModel = new OffersModel({ apiService: pointService });
 const destinationsModel = new DestinationsModel({ apiService: pointService });

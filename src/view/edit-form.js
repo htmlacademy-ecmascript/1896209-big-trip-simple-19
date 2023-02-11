@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {ucFirst} from '../utils/utils.js';
+import {upperCaseFirst} from '../utils/utils.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
@@ -19,7 +19,7 @@ function renderOfferForType(offer, checked, isDisabled) {
 function getEventTypeItem(type) {
   return `<div class="event__type-item">
 <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-<label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${ucFirst(type)}</label>
+<label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${upperCaseFirst(type)}</label>
 </div>`;
 }
 
@@ -262,11 +262,11 @@ export default class FormView extends AbstractStatefulView {
     if (evt.target.checked) {
       const newOffer = this.#offersByType.find((offer) => offer.type === this._state.type).offers
         .find((offer) => offerId === offer.id);
-      this.updateElement({
+      this._setState({
         offers: [...this._state.offers, newOffer]
       });
     } else {
-      this.updateElement({
+      this._setState({
         offers: this._state.offers.filter((offer) => offerId !== offer.id)
       });
     }
